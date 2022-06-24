@@ -40,16 +40,16 @@ def _get_currate_responce(currency_pairs):
     try:
         return requests.get(url).text
     except (URLError, HTTPError):
-        raise ApiServiceError('Не смогли получить данные о курсе валюты.')
+        raise ApiServiceError('Невозможно получить данные о курсе валюты.')
 
 
 def _parse_currate_responce(currate_responce: str) -> CurrencyRate:
     try:
         currate_dict = json.loads(currate_responce)
         if currate_dict['status'] != 200:
-            raise ApiServiceError('Не смогли получить данные о курсе валюты.')
+            raise ApiServiceError('Невозможно получить данные о курсе валюты.')
     except JSONDecodeError:
-        raise ApiServiceError('Не смогли обработать полученные данные.')
+        raise ApiServiceError('Невозможно обработать полученные данные.')
     return CurrencyRate(base_currency=_parse_base_currency(currate_dict),
                         quote_currency=_parse_convert_currency(currate_dict),
                         rate=_parse_rate(currate_dict),
@@ -60,7 +60,7 @@ def _parse_base_currency(currate_dict: dict) -> str:
     try:
         currency = [i[:3] for i in currate_dict['data'].keys()][0]
     except (KeyError, IndexError, AttributeError):
-        raise ApiServiceError('Не смогли определить базовую валюту.')
+        raise ApiServiceError('Невозможно определить базовую валюту.')
     return [name for name, member in СurrenciesValues.__members__.items() if member.name == currency][0]
 
 
@@ -68,7 +68,7 @@ def _parse_convert_currency(currate_dict: dict) -> str:
     try:
         currency = [i[3:] for i in currate_dict['data'].keys()][0]
     except (KeyError, IndexError, AttributeError):
-        raise ApiServiceError('Не смогли определить валюту для конвертации.')
+        raise ApiServiceError('Невозможно определить валюту для конвертации.')
     return [name for name, member in СurrenciesValues.__members__.items() if member.name == currency][0]
 
 
@@ -77,7 +77,7 @@ def _parse_rate(currate_dict: dict) -> float:
         pairs = [i for i in currate_dict['data'].keys()][0]
         rate = float(currate_dict['data'][pairs])
     except (IndexError, KeyError, AttributeError):
-        raise ApiServiceError('Не смогли получить курс валюты для конвертации.')
+        raise ApiServiceError('Невозможно получить курс валюты для конвертации.')
     except ValueError:
         raise ApiServiceError(f'Неверное значение курса - {currate_dict["data"][pairs]}')
     return rate

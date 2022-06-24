@@ -1,1 +1,1 @@
-from .extensions import CurrencyConvertor
+from .extensions import CurrencyConvertor, InflectCurrency

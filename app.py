@@ -2,7 +2,7 @@ import telebot
 
 from settings import TOKEN, СurrenciesValues
 from exception import ConvertionException, ApiServiceError
-from extensions import CurrencyConvertor
+from extensions import CurrencyConvertor, InflectCurrency
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -31,7 +31,7 @@ def convert(message: telebot.types.Message):
         if len(values) != 3:
             raise ConvertionException('Неверное количество параметров.')
         base, quote, amount = values
-        res = CurrencyConvertor.get_price(base=base, quote=quote, amount=amount)
+        price = CurrencyConvertor.get_price(base=base, quote=quote, amount=amount)
     except ConvertionException as e:
         bot.reply_to(message, f'Ошибка пользователя.\n{e}')
     except ApiServiceError as e:
@@ -39,7 +39,10 @@ def convert(message: telebot.types.Message):
     except Exception as e:
         bot.reply_to(message, f'Не удалось обработать команду.\n{e}')
     else:
-        bot.send_message(message.chat.id, res)
+        txt = (f'{amount} {InflectCurrency.make_agree_with_amount(amount=float(amount), values=base)} '
+               f'равно {price} {InflectCurrency.make_agree_with_amount(amount=price, values=quote)}.')
+
+        bot.send_message(message.chat.id, txt)
 
 
 bot.polling()

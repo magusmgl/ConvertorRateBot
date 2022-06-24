@@ -47,7 +47,4 @@ class CurrencyConvertor:
                               quote_currency=currencies_dict[quote])
         api_responce = get_currency_rate(pairs)
         rate = api_responce.rate
-        antwort = (f'{amount} {InflectCurrency.make_agree_with_amount(amount=float(amount), values=base)} '
-                   f'равно {(rate * float(amount)):0.2f} {InflectCurrency.make_agree_with_amount(amount=rate * float(amount), values=quote)}.')
-
-        return antwort
+        return round(rate * float(amount), 2)
